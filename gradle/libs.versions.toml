@@ -1,0 +1,149 @@
+[versions]
+agp = "8.8.0"
+kotlin = "2.0.21"
+ksp = "2.0.21-1.0.28"
+secrets = "2.0.1"
+coreKtx = "1.15.0"
+kotlinParcelize = "2.1.20-RC"
+
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+mockito = "5.15.2"
+mockitoKotlin = "5.4.0"
+
+androidxComposeBom = "2025.02.00"
+material3Android = "1.3.1"
+activityCompose = "1.9.3"
+navigation = "2.8.7"
+coil = "3.0.4"
+mviOrbit = "9.0.0"
+secretsGradlePlugin = "2.0.1"
+viewModelKtx = "2.8.7"
+
+retrofit = "2.9.0"
+okHttp3 = "4.12.0"
+gson = "2.10.1"
+
+coroutines = "1.9.0"
+
+room = "2.6.1"
+
+appcompat = "1.7.0"
+material = "1.12.0"
+
+exoplayer = "1.5.1"
+
+koin = "4.0.1"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+androidx-ui-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-ui-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
+androidx-ui-animation = { module = "androidx.compose.animation:animation" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
+androidx-material3-navigationSuite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
+androidx-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
+androidx-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
+
+androidx-compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+
+mvi-orbit-core = { group = "org.orbit-mvi", name = "orbit-core", version.ref = "mviOrbit" }
+mvi-orbit-viewmodel = { group = "org.orbit-mvi", name = "orbit-viewmodel", version.ref = "mviOrbit" }
+mvi-orbit-compose = { group = "org.orbit-mvi", name = "orbit-compose", version.ref = "mviOrbit" }
+
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "viewModelKtx" }
+
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHttp3" }
+
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+
+exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "exoplayer" }
+exoplayer-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "exoplayer" }
+exoplayer-session = { group = "androidx.media3", name = "media3-session", version.ref = "exoplayer" }
+
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
+[bundles]
+exo-player = [
+    "exoplayer",
+    "exoplayer-session",
+    "exoplayer-ui"
+]
+
+compose = [
+    "androidx-ui",
+    "androidx-ui-runtime",
+    "androidx-ui-animation",
+    "androidx-ui-foundation",
+    "androidx-ui-foundation-layout",
+    "androidx-ui-graphics",
+    "androidx-ui-util",
+    "androidx-material3",
+    "androidx-material3-android",
+    "androidx-material3-navigationSuite",
+    "androidx-material3-windowSizeClass",
+    "androidx-material-iconsExtended",
+    "androidx-activity-compose",
+]
+
+mvi-core = [
+    "mvi-orbit-core",
+    "mvi-orbit-viewmodel",
+    "mvi-orbit-compose"
+]
+
+coil = [
+    "coil-compose",
+    "coil-network"
+]
+
+mockito = [
+    "mockito-core",
+    "mockito-kotlin"
+]
+
+koin = [
+    "koin-core",
+    "koin-androidx-compose"
+]
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlinParcelize" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+gradle-secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
