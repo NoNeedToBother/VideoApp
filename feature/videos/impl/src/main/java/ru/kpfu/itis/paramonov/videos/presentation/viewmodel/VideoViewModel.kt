@@ -2,11 +2,9 @@ package ru.kpfu.itis.paramonov.videos.presentation.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
@@ -29,7 +27,6 @@ class VideoViewModel(
     fun onIntent(intent: VideoScreenIntent) = intent {
         when(intent) {
             is VideoScreenIntent.GetVideo -> getVideo(intent.id)
-            VideoScreenIntent.ClearVideo -> clearVideo()
         }
     }
 
@@ -55,10 +52,8 @@ class VideoViewModel(
         }
     }
 
-    private fun clearVideo() {
-        viewModelScope.launch {
-            player.clearVideoSurface()
-            player.release()
-        }
+    override fun onCleared() {
+        super.onCleared()
+        player.release()
     }
 }

@@ -1,15 +1,23 @@
 package ru.kpfu.itis.paramonov.videos.presentation.ui
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.view.LayoutInflater
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
+import androidx.activity.compose.BackHandler
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,11 +26,16 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -30,9 +43,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import ru.kpfu.itis.paramonov.videos.R
 import ru.kpfu.itis.paramonov.videos.presentation.model.VideoUiModel
@@ -42,7 +54,8 @@ import ru.kpfu.itis.paramonov.videos.presentation.viewmodel.VideoViewModel
 
 @Composable
 fun VideoScreen(
-    id: Long
+    id: Long,
+    navigateBack: () -> Unit
 ) {
     val viewModel = koinInject<VideoViewModel>()
 
@@ -60,7 +73,7 @@ fun VideoScreen(
         }
     }
 
-    var lifecycle by remember {
+    var lifecycle by rememberSaveable {
         mutableStateOf(Lifecycle.Event.ON_CREATE)
     }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -75,16 +88,59 @@ fun VideoScreen(
         }
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-        }
+    val configuration = LocalConfiguration.current
+    var orientation by rememberSaveable { mutableIntStateOf(configuration.orientation) }
+
+    LaunchedEffect(configuration) {
+        snapshotFlow { configuration.orientation }
+            .collect { newOrientation ->
+                orientation = newOrientation
+            }
+    }
+
+    var fullscreen by rememberSaveable { mutableStateOf(false) }
+    val ratio by rememberSaveable(state.value.video) {
+        mutableStateOf(
+            state.value.video?.let {
+                it.height.toFloat() / it.width
+            }
+        )
+    }
+
+    val context = LocalContext.current
+
+    val scrollState = rememberScrollState()
+    val screenModifier = remember(fullscreen) {
+        mutableStateOf(
+            if (!fullscreen) Modifier.fillMaxWidth(0.8f).verticalScroll(
+                scrollState
+            ) else Modifier
+        )
+    }
+
+    BackHandler {
+        exitFullScreen(context)
+        navigateBack()
     }
 
     VideoScreenContent(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = screenModifier.value,
         video = state.value.video,
         lifecycle = lifecycle,
-        player = state.value.player
+        player = state.value.player,
+        landscapeMode = (orientation == ORIENTATION_LANDSCAPE),
+        fullscreen = fullscreen,
+        onFullscreenClick = {
+            fullscreen = !fullscreen
+            ratio?.let {
+                if (fullscreen) {
+                    val newOrientation = if (it > 1f) ORIENTATION_PORTRAIT
+                    else ORIENTATION_LANDSCAPE
+                    orientation = newOrientation
+                    enterFullScreen(context, newOrientation)
+                } else exitFullScreen(context)
+            }
+        }
     )
 }
 
@@ -93,22 +149,23 @@ fun VideoScreenContent(
     modifier: Modifier = Modifier,
     video: VideoUiModel?,
     lifecycle: Lifecycle.Event,
-    player: Player
+    landscapeMode: Boolean,
+    fullscreen: Boolean,
+    onFullscreenClick: () -> Unit,
+    player: Player,
 ) {
-    val scrollState = rememberScrollState()
-
     Column(
-        modifier = modifier.scrollable(
-            state = scrollState,
-            orientation = Orientation.Vertical
-        )
+        modifier = modifier
     ) {
         video?.let {
             Player(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 player = player,
                 video = it,
-                lifecycle = lifecycle
+                lifecycle = lifecycle,
+                landscapeMode = landscapeMode,
+                fullscreen = fullscreen,
+                onFullscreenClick = onFullscreenClick
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -122,16 +179,33 @@ fun VideoScreenContent(
             modifier = Modifier.size(100.dp).align(Alignment.CenterHorizontally)
         )
     }
-
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun Player(
     modifier: Modifier = Modifier,
     player: Player,
     video: VideoUiModel,
-    lifecycle: Lifecycle.Event
+    lifecycle: Lifecycle.Event,
+    landscapeMode: Boolean,
+    fullscreen: Boolean,
+    onFullscreenClick: () -> Unit,
 ) {
+    val configuration = LocalConfiguration.current
+    var playerModifier = modifier
+
+    if (!fullscreen) {
+        playerModifier = if (landscapeMode)
+            playerModifier.height(configuration.screenHeightDp.dp * 0.75f)
+        else
+            playerModifier.width(configuration.screenWidthDp.dp * 0.85f)
+        playerModifier =
+            playerModifier.aspectRatio(video.width.toFloat() / video.height)
+    } else playerModifier = playerModifier.height(configuration.screenHeightDp.dp)
+        .width(configuration.screenWidthDp.dp)
+        .aspectRatio(video.width.toFloat() / video.height)
+
     AndroidView(
         factory = { context ->
             (LayoutInflater.from(context).inflate(
@@ -139,6 +213,10 @@ fun Player(
                 null
             ) as PlayerView).also {
                 it.player = player
+                it.setFullscreenButtonState(fullscreen)
+                it.setFullscreenButtonClickListener {
+                    onFullscreenClick()
+                }
             }
         },
         update = {
@@ -153,7 +231,21 @@ fun Player(
                 else -> Unit
             }
         },
-        modifier = modifier
-            .aspectRatio(video.width.toFloat() / video.height)
+        modifier = playerModifier
     )
+}
+
+@SuppressLint("SourceLockedOrientationActivity")
+private fun enterFullScreen(context: Context, orientation: Int) {
+    val activity = context as Activity
+    if (orientation == ORIENTATION_PORTRAIT)
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    else activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    activity.actionBar?.hide()
+}
+
+private fun exitFullScreen(context: Context) {
+    val activity = context as Activity
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    activity.actionBar?.show()
 }

@@ -84,7 +84,10 @@ fun ScreenContent(
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getLong("id")
             id?.let {
-                VideoScreen(id = id)
+                VideoScreen(
+                    id = id,
+                    navigateBack = { navController.popBackStack() }
+                )
             }
         }
     }
