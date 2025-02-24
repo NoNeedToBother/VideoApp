@@ -1,9 +1,10 @@
 package ru.kpfu.itis.paramonov.videos.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
-import ru.kpfu.itis.paramonov.videos.api.usecase.GetMostPopularYouTubeVideosUseCase
+import ru.kpfu.itis.paramonov.videos.api.usecase.GetPopularPexelsVideosUseCase
 import ru.kpfu.itis.paramonov.videos.api.usecase.GetSavedVideosUseCase
 import ru.kpfu.itis.paramonov.videos.api.usecase.SaveVideosUseCase
 import ru.kpfu.itis.paramonov.videos.domain.mapper.VideoUiModelMapper
@@ -14,7 +15,7 @@ import java.util.ArrayList
 import java.util.Date
 
 class VideosViewModel(
-    private val getMostPopularYouTubeVideosUseCase: GetMostPopularYouTubeVideosUseCase,
+    private val getMostPopularYouTubeVideosUseCase: GetPopularPexelsVideosUseCase,
     private val saveVideosUseCase: SaveVideosUseCase,
     private val getSavedVideosUseCase: GetSavedVideosUseCase,
     private val videoUiModelMapper: VideoUiModelMapper,
@@ -37,7 +38,7 @@ class VideosViewModel(
         try {
             val saved = getSavedVideosUseCase.invoke(limit, after)
             if (saved.size != limit) {
-                val videos = getMostPopularYouTubeVideosUseCase.invoke().take(limit - saved.size)
+                val videos = getMostPopularYouTubeVideosUseCase.invoke(limit).take(limit - saved.size)
                 saveVideosUseCase.invoke(videos)
 
                 val resultList = ArrayList(saved)
@@ -51,8 +52,11 @@ class VideosViewModel(
                 }
             }
         } catch (ex: Throwable) {
-            //postSideEffect()
+            //when(ex) {
+
+            //}
         } finally {
+            delay(100L) //otherwise pull to refresh indicator stays on screen
             reduce { state.copy(isRefreshing = false) }
         }
     }

@@ -1,18 +1,12 @@
 package ru.kpfu.itis.paramonov.videos.api.model
 
-import kotlin.time.Duration
-
 data class VideoModel(
-    val id: String,
+    val id: Long,
     val title: String,
-    val description: String,
-    val duration: Duration,
-    val statistics: VideoStatistics,
-    val defaultThumbnailUrl: String,
-    val standardThumbnailUrl: String,
+    val duration: Int,
+    val videoUrl: String,
+    val height: Int,
+    val width: Int,
+    val thumbnailUrl: String,
 )
 
-data class VideoStatistics(
-    val viewCount: Int,
-    val likeCount: Int,
-)

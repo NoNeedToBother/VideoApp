@@ -10,7 +10,7 @@ class GetSavedVideoUseCaseImpl(
     private val dispatcher: CoroutineDispatcher,
     private val savedVideoRepository: SavedVideoRepository
 ): GetSavedVideoUseCase {
-    override suspend fun invoke(id: String): VideoModel {
+    override suspend fun invoke(id: Long): VideoModel {
         return withContext(dispatcher) {
             savedVideoRepository.getLatestVideoByYoutubeId(id)
         }

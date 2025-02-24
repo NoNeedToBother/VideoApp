@@ -51,6 +51,8 @@ dependencies {
 
     implementation(libs.viewmodel.ktx)
 
+    implementation(libs.bundles.exo.player)
+
     testImplementation(libs.junit)
     testImplementation(libs.bundles.mockito)
     testImplementation(libs.kotlinx.coroutines.test)

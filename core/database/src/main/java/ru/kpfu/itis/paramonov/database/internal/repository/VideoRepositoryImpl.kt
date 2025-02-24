@@ -23,7 +23,7 @@ internal class VideoRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestVideoByYoutubeId(id: String): Video {
+    override suspend fun getLatestVideoByYoutubeId(id: Long): Video {
         return withContext(dispatcher) {
             mapper.fromEntity(
                 database.videoDao().getLatestVideoByYoutubeId(id)

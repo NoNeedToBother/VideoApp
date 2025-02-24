@@ -11,19 +11,16 @@ import java.util.Date
 internal data class VideoEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    @ColumnInfo(name = "youtube_id")
-    val youTubeId: String,
+    @ColumnInfo(name = "pexels_id")
+    val pexelsId: Long,
     val title: String,
-    val description: String,
-    val duration: String,
-    @ColumnInfo(name = "view_count")
-    val viewCount: Int,
-    @ColumnInfo(name = "like_count")
-    val likeCount: Int,
-    @ColumnInfo(name = "default_thumbnail_url")
-    val defaultThumbnailUrl: String,
-    @ColumnInfo(name = "standard_thumbnail_url")
-    val standardThumbnailUrl: String,
+    val duration: Int,
+    @ColumnInfo(name = "thumbnail_url")
+    val thumbnailUrl: String,
+    @ColumnInfo(name = "video_url")
+    val videoUrl: String,
+    val height: Int,
+    val width: Int,
     @ColumnInfo(name = "save_date")
     val saveDate: Long = Date().time,
 )

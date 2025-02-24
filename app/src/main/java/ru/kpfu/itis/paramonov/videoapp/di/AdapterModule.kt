@@ -3,30 +3,26 @@ package ru.kpfu.itis.paramonov.videoapp.di
 import org.koin.dsl.module
 import ru.kpfu.itis.paramonov.database.external.model.Video
 import ru.kpfu.itis.paramonov.database.external.repository.VideoRepository
-import ru.kpfu.itis.paramonov.network.external.repository.YouTubeVideoRepository
+import ru.kpfu.itis.paramonov.network.external.repository.PexelsVideoRepository
 import ru.kpfu.itis.paramonov.videos.api.model.VideoModel
-import ru.kpfu.itis.paramonov.videos.api.model.VideoStatistics
-import ru.kpfu.itis.paramonov.videos.api.repository.YouTubeVideoRepository as FeatureYouTubeVideoRepository
+import ru.kpfu.itis.paramonov.videos.api.repository.PexelsVideoRepository as FeaturePexelsVideoRepository
 import ru.kpfu.itis.paramonov.videos.api.repository.SavedVideoRepository
 import java.util.Date
 
 val adapterModule = module {
-    factory<FeatureYouTubeVideoRepository> {
-        val youTubeVideoRepository: YouTubeVideoRepository = get()
-        object : FeatureYouTubeVideoRepository {
-            override suspend fun getMostPopularVideos(): List<VideoModel> {
-                return youTubeVideoRepository.getMostPopularVideos().map {
+    factory<FeaturePexelsVideoRepository> {
+        val youTubeVideoRepository: PexelsVideoRepository = get()
+        object : FeaturePexelsVideoRepository {
+            override suspend fun getMostPopularVideos(limit: Int): List<VideoModel> {
+                return youTubeVideoRepository.getMostPopularVideos(limit).map {
                     VideoModel(
                         id = it.id,
                         title = it.title,
-                        description = it.description,
                         duration = it.duration,
-                        statistics = VideoStatistics(
-                            viewCount = it.statistics.viewCount,
-                            likeCount = it.statistics.likeCount,
-                        ),
-                        defaultThumbnailUrl = it.defaultThumbnailUrl,
-                        standardThumbnailUrl = it.standardThumbnailUrl,
+                        thumbnailUrl = it.thumbnailUrl,
+                        videoUrl = it.videoUrl,
+                        height = it.height,
+                        width = it.width
                     )
                 }
             }
@@ -42,7 +38,7 @@ val adapterModule = module {
                 }
             }
 
-            override suspend fun getLatestVideoByYoutubeId(id: String): VideoModel {
+            override suspend fun getLatestVideoByYoutubeId(id: Long): VideoModel {
                 return mapSavedVideoToFeatureVideosVideoModel(
                     repository.getLatestVideoByYoutubeId(id)
                 )
@@ -61,14 +57,11 @@ fun mapSavedVideoToFeatureVideosVideoModel(model: Video): VideoModel {
     return VideoModel(
         id = model.id,
         title = model.title,
-        description = model.description,
         duration = model.duration,
-        statistics = VideoStatistics(
-            viewCount = model.statistics.viewCount,
-            likeCount = model.statistics.likeCount
-        ),
-        defaultThumbnailUrl = model.defaultThumbnailUrl,
-        standardThumbnailUrl = model.standardThumbnailUrl,
+        thumbnailUrl = model.thumbnailUrl,
+        videoUrl = model.videoUrl,
+        height = model.height,
+        width = model.width,
     )
 }
 
@@ -76,13 +69,10 @@ fun mapFeatureVideosVideoModelToSavedVideo(model: VideoModel): Video {
     return Video(
         id = model.id,
         title = model.title,
-        description = model.description,
         duration = model.duration,
-        statistics = ru.kpfu.itis.paramonov.database.external.model.VideoStatistics(
-            viewCount = model.statistics.viewCount,
-            likeCount = model.statistics.likeCount,
-        ),
-        defaultThumbnailUrl = model.defaultThumbnailUrl,
-        standardThumbnailUrl = model.standardThumbnailUrl,
+        thumbnailUrl = model.thumbnailUrl,
+        videoUrl = model.videoUrl,
+        height = model.height,
+        width = model.width,
     )
 }

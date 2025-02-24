@@ -1,6 +1,6 @@
-package ru.kpfu.itis.paramonov.videos.presentation.model
+package ru.kpfu.itis.paramonov.network.external.model
 
-data class VideoUiModel(
+data class PexelsVideoModel(
     val id: Long,
     val title: String,
     val duration: Int,

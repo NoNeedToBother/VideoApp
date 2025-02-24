@@ -7,7 +7,7 @@ interface VideoRepository {
 
     suspend fun getLatestVideos(limit: Int, after: Date): List<Video>
 
-    suspend fun getLatestVideoByYoutubeId(id: String): Video
+    suspend fun getLatestVideoByYoutubeId(id: Long): Video
 
     suspend fun saveVideos(videos: List<Video>)
 

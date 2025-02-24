@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
@@ -42,9 +44,12 @@ class MainActivity: ComponentActivity() {
                     )
                 }
             ) {
-                ScreenContent(
-                    modifier = Modifier.fillMaxSize()
-                )
+                Scaffold { paddingValues ->
+                    ScreenContent(
+                        modifier = Modifier.fillMaxSize()
+                            .padding(paddingValues)
+                    )
+                }
             }
         }
     }
@@ -73,11 +78,11 @@ fun ScreenContent(
             route = Routes.VideoScreen.route + "/{id}",
             arguments = listOf(
                 navArgument("id") {
-                    type = NavType.StringType
+                    type = NavType.LongType
                 }
             )
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("id")
+            val id = backStackEntry.arguments?.getLong("id")
             id?.let {
                 VideoScreen(id = id)
             }

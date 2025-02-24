@@ -2,8 +2,8 @@ package ru.kpfu.itis.paramonov.videos.api.repository
 
 import ru.kpfu.itis.paramonov.videos.api.model.VideoModel
 
-interface YouTubeVideoRepository {
+interface PexelsVideoRepository {
 
-    suspend fun getMostPopularVideos(): List<VideoModel>
+    suspend fun getMostPopularVideos(limit: Int): List<VideoModel>
 
 }
