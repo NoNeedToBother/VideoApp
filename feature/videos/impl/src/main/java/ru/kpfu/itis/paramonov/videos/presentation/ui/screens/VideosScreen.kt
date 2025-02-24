@@ -1,8 +1,9 @@
-package ru.kpfu.itis.paramonov.videos.presentation.ui
+package ru.kpfu.itis.paramonov.videos.presentation.ui.screens
 
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +39,7 @@ import ru.kpfu.itis.paramonov.videos.R
 import ru.kpfu.itis.paramonov.videos.presentation.model.VideoUiModel
 import ru.kpfu.itis.paramonov.videos.presentation.mvi.videos.VideosScreenIntent
 import ru.kpfu.itis.paramonov.videos.presentation.mvi.videos.VideosScreenSideEffect
+import ru.kpfu.itis.paramonov.videos.presentation.ui.components.ErrorDialog
 import ru.kpfu.itis.paramonov.videos.presentation.viewmodel.VideosViewModel
 import java.time.Instant
 import java.util.Date
@@ -60,6 +62,8 @@ fun VideosScreen(
     val state = viewModel.container.stateFlow.collectAsState()
     val effect = viewModel.container.sideEffectFlow
 
+    var error by remember { mutableStateOf<Pair<String, String>?>(null) }
+
     LaunchedEffect(Unit) {
         viewModel.onIntent(VideosScreenIntent.GetMostPopularVideos(
             limit = VIDEO_LIMIT,
@@ -68,7 +72,9 @@ fun VideosScreen(
 
         effect.collect {
             when(it) {
-                is VideosScreenSideEffect.ShowError -> {}
+                is VideosScreenSideEffect.ShowError -> {
+                    error = it.title to it.message
+                }
             }
         }
     }
@@ -111,6 +117,16 @@ fun VideosScreen(
             },
             onVideoClick = { video -> goToVideoScreen(video) }
         )
+    }
+
+    Box {
+        error?.let {
+            ErrorDialog(
+                onDismiss = { error = null },
+                title = it.first,
+                text = it.second
+            )
+        }
     }
 }
 

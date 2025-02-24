@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
+import ru.kpfu.itis.paramonov.core.resources.ResourceManager
+import ru.kpfu.itis.paramonov.videos.R
 import ru.kpfu.itis.paramonov.videos.api.usecase.GetSavedVideoUseCase
 import ru.kpfu.itis.paramonov.videos.domain.mapper.VideoUiModelMapper
 import ru.kpfu.itis.paramonov.videos.presentation.mvi.video.VideoScreenIntent
@@ -18,6 +20,7 @@ class VideoViewModel(
     private val getSavedVideoUseCase: GetSavedVideoUseCase,
     private val videoUiModelMapper: VideoUiModelMapper,
     private val player: Player,
+    private val resourceManager: ResourceManager,
 ): ViewModel(), ContainerHost<VideoScreenState, VideoScreenSideEffect> {
 
     override val container = container<VideoScreenState, VideoScreenSideEffect>(
@@ -48,7 +51,12 @@ class VideoViewModel(
                 state.copy(player = player)
             }
         } catch (ex: Throwable) {
-            //postSideEffect()
+            postSideEffect(
+                VideoScreenSideEffect.ShowError(
+                    resourceManager.getString(R.string.empty),
+                    resourceManager.getString(R.string.default_error)
+                )
+            )
         }
     }
 

@@ -1,4 +1,4 @@
-package ru.kpfu.itis.paramonov.videos.presentation.ui
+package ru.kpfu.itis.paramonov.videos.presentation.ui.screens
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -9,6 +9,7 @@ import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.view.LayoutInflater
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -50,6 +51,7 @@ import ru.kpfu.itis.paramonov.videos.R
 import ru.kpfu.itis.paramonov.videos.presentation.model.VideoUiModel
 import ru.kpfu.itis.paramonov.videos.presentation.mvi.video.VideoScreenIntent
 import ru.kpfu.itis.paramonov.videos.presentation.mvi.video.VideoScreenSideEffect
+import ru.kpfu.itis.paramonov.videos.presentation.ui.components.ErrorDialog
 import ru.kpfu.itis.paramonov.videos.presentation.viewmodel.VideoViewModel
 
 @Composable
@@ -62,13 +64,17 @@ fun VideoScreen(
     val state = viewModel.container.stateFlow.collectAsState()
     val effect = viewModel.container.sideEffectFlow
 
+    var error by remember { mutableStateOf<Pair<String, String>?>(null) }
+
     LaunchedEffect(Unit) {
         viewModel.onIntent(
             VideoScreenIntent.GetVideo(id = id))
 
         effect.collect {
             when(it) {
-                is VideoScreenSideEffect.ShowError -> {}
+                is VideoScreenSideEffect.ShowError -> {
+                    error = it.title to it.message
+                }
             }
         }
     }
@@ -142,6 +148,16 @@ fun VideoScreen(
             }
         }
     )
+
+    Box {
+        error?.let {
+            ErrorDialog(
+                onDismiss = { error = null },
+                title = it.first,
+                text = it.second
+            )
+        }
+    }
 }
 
 @Composable

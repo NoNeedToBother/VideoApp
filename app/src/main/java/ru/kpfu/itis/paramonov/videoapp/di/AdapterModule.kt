@@ -3,6 +3,7 @@ package ru.kpfu.itis.paramonov.videoapp.di
 import org.koin.dsl.module
 import ru.kpfu.itis.paramonov.database.external.model.Video
 import ru.kpfu.itis.paramonov.database.external.repository.VideoRepository
+import ru.kpfu.itis.paramonov.network.external.exception.HttpException
 import ru.kpfu.itis.paramonov.network.external.repository.PexelsVideoRepository
 import ru.kpfu.itis.paramonov.videos.api.model.VideoModel
 import ru.kpfu.itis.paramonov.videos.api.repository.PexelsVideoRepository as FeaturePexelsVideoRepository
@@ -11,19 +12,23 @@ import java.util.Date
 
 val adapterModule = module {
     factory<FeaturePexelsVideoRepository> {
-        val youTubeVideoRepository: PexelsVideoRepository = get()
+        val pexelsVideoRepository: PexelsVideoRepository = get()
         object : FeaturePexelsVideoRepository {
             override suspend fun getMostPopularVideos(limit: Int): List<VideoModel> {
-                return youTubeVideoRepository.getMostPopularVideos(limit).map {
-                    VideoModel(
-                        id = it.id,
-                        title = it.title,
-                        duration = it.duration,
-                        thumbnailUrl = it.thumbnailUrl,
-                        videoUrl = it.videoUrl,
-                        height = it.height,
-                        width = it.width
-                    )
+                try {
+                    return pexelsVideoRepository.getMostPopularVideos(limit).map {
+                        VideoModel(
+                            id = it.id,
+                            title = it.title,
+                            duration = it.duration,
+                            thumbnailUrl = it.thumbnailUrl,
+                            videoUrl = it.videoUrl,
+                            height = it.height,
+                            width = it.width
+                        )
+                    }
+                } catch (ex: HttpException) {
+                    throw ru.kpfu.itis.paramonov.videos.api.exception.HttpException(code = ex.code)
                 }
             }
         }

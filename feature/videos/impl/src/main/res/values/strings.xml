@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="video_duration">%02dh:%02dm:%02ds</string>
+    <string name="network_error">Network error</string>
+    <string name="no_internet_connection">Unable to connect, check your internet connection</string>
+    <string name="http_error">Http error, status code %d</string>
+    <string name="default_error">Something went wrong…</string>
+    <string name="empty"/>
 </resources>

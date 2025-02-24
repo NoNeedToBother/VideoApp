@@ -22,8 +22,8 @@ import ru.kpfu.itis.paramonov.network.external.di.networkModule
 import ru.kpfu.itis.paramonov.videoapp.di.adapterModule
 import ru.kpfu.itis.paramonov.videoapp.di.commonModule
 import ru.kpfu.itis.paramonov.videos.di.featureVideosModule
-import ru.kpfu.itis.paramonov.videos.presentation.ui.VideoScreen
-import ru.kpfu.itis.paramonov.videos.presentation.ui.VideosScreen
+import ru.kpfu.itis.paramonov.videos.presentation.ui.screens.VideoScreen
+import ru.kpfu.itis.paramonov.videos.presentation.ui.screens.VideosScreen
 
 class MainActivity: ComponentActivity() {
 

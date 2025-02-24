@@ -1,12 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.gradle.secrets)
 }
 
 android {
-    namespace = "ru.kpfu.itis.paramonov.videos"
+    namespace = "ru.kpfu.itis.paramonov.core"
     compileSdk = 35
 
     defaultConfig {
@@ -32,31 +30,14 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
-    implementation(project(":core:core"))
-    implementation(project(":feature:videos:api"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-
-    implementation(libs.bundles.koin)
-    implementation(libs.bundles.compose)
-    implementation(libs.bundles.mvi.core)
-    implementation(libs.bundles.coil)
-
-    implementation(libs.viewmodel.ktx)
-
-    implementation(libs.bundles.exo.player)
-
     testImplementation(libs.junit)
-    testImplementation(libs.bundles.mockito)
-    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
