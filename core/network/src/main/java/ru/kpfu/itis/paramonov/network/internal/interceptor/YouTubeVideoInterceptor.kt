@@ -1,6 +1,5 @@
 package ru.kpfu.itis.paramonov.network.internal.interceptor
 
-import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 import ru.kpfu.itis.paramonov.network.BuildConfig
@@ -13,7 +12,6 @@ internal class YouTubeVideoInterceptor: Interceptor {
             .addQueryParameter(QueryParams.REGION_CODE_PARAM, QueryParams.REGION_CODE_PARAM_VALUE)
             .addQueryParameter(QueryParams.API_KEY_PARAM, BuildConfig.youTubeApiKey)
             .build()
-        Log.i("AAAAAAAAA", newUrl.toString())
 
         val requestBuilder = chain.request().newBuilder().url(newUrl)
 

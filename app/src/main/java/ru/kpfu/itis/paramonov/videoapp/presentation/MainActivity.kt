@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.KoinApplication
+import ru.kpfu.itis.paramonov.database.external.di.databaseModule
 import ru.kpfu.itis.paramonov.navigation.Routes
 import ru.kpfu.itis.paramonov.network.external.di.networkModule
 import ru.kpfu.itis.paramonov.videoapp.di.adapterModule
@@ -35,6 +36,7 @@ class MainActivity: ComponentActivity() {
                     modules(
                         commonModule,
                         networkModule,
+                        databaseModule,
                         featureVideosModule,
                         adapterModule,
                     )

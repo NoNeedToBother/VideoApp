@@ -1,4 +1,4 @@
-package ru.kpfu.itis.paramonov.videos.presentation.mvi
+package ru.kpfu.itis.paramonov.videos.presentation.mvi.videos
 
 import ru.kpfu.itis.paramonov.videos.presentation.model.VideoUiModel
 

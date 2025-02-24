@@ -32,9 +32,22 @@ import org.koin.compose.koinInject
 import ru.kpfu.itis.paramonov.videos.R
 import ru.kpfu.itis.paramonov.videos.presentation.model.VideoStatisticsUiModel
 import ru.kpfu.itis.paramonov.videos.presentation.model.VideoUiModel
-import ru.kpfu.itis.paramonov.videos.presentation.mvi.VideosScreenIntent
-import ru.kpfu.itis.paramonov.videos.presentation.mvi.VideosScreenSideEffect
+import ru.kpfu.itis.paramonov.videos.presentation.mvi.videos.VideosScreenIntent
+import ru.kpfu.itis.paramonov.videos.presentation.mvi.videos.VideosScreenSideEffect
 import ru.kpfu.itis.paramonov.videos.presentation.viewmodel.VideosViewModel
+import java.time.Instant
+import java.util.Date
+import java.util.Locale
+import kotlin.time.Duration
+
+private const val VIDEO_LIMIT = 5
+private const val HOUR_PASSED_TO_UPDATE_VIDEOS = 4
+
+private fun getAfterDate(): Date {
+    val now = Date.from(Instant.now())
+    val after = now.time - HOUR_PASSED_TO_UPDATE_VIDEOS * 60 * 60 * 1000
+    return Date.from(Instant.ofEpochMilli(after))
+}
 
 @Composable
 fun VideosScreen(
@@ -46,7 +59,10 @@ fun VideosScreen(
     val effect = viewModel.container.sideEffectFlow
 
     LaunchedEffect(Unit) {
-        viewModel.onIntent(VideosScreenIntent.GetMostPopularVideos)
+        viewModel.onIntent(VideosScreenIntent.GetMostPopularVideos(
+            limit = VIDEO_LIMIT,
+            after = getAfterDate()
+        ))
 
         effect.collect {
             when(it) {
@@ -55,17 +71,20 @@ fun VideosScreen(
         }
     }
 
-    ScreenContent(
+    VideosScreenContent(
         videos = state.value.videos,
         isRefreshing = state.value.isRefreshing,
-        onRefresh = { viewModel.onIntent(VideosScreenIntent.GetMostPopularVideos) },
+        onRefresh = { viewModel.onIntent(VideosScreenIntent.GetMostPopularVideos(
+            limit = VIDEO_LIMIT,
+            after = getAfterDate()
+        )) },
         onVideoClick = { video -> goToVideoScreen(video) }
     )
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun ScreenContent(
+fun VideosScreenContent(
     modifier: Modifier = Modifier,
     videos: List<VideoUiModel>,
     isRefreshing: Boolean,
@@ -115,11 +134,30 @@ fun VideoItem(
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
+        Time(
+            modifier = Modifier.fillMaxWidth(),
+            time = video.duration
+        )
         ViewAndLikeSection(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
             statistics = video.statistics
         )
     }
+}
+
+@Composable
+fun Time(
+    modifier: Modifier = Modifier,
+    time: Duration,
+) {
+    Text(
+        modifier = modifier,
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.bodySmall,
+        text = time.toComponents { hours, minutes, seconds, _ ->
+            String.format(Locale.ROOT, "%02dh:%02dm:%02ds", hours, minutes, seconds)
+        }
+    )
 }
 
 @Composable

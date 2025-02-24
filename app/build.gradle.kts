@@ -43,6 +43,7 @@ android {
 dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:navigation"))
+    implementation(project(":core:database"))
     implementation(project(":feature:videos:api"))
     implementation(project(":feature:videos:impl"))
 
