@@ -1,10 +1,6 @@
 package ru.kpfu.itis.paramonov.videos.presentation.ui
 
 import android.view.LayoutInflater
-import android.view.Surface
-import androidx.compose.foundation.AndroidEmbeddedExternalSurface
-import androidx.compose.foundation.AndroidExternalSurface
-import androidx.compose.foundation.AndroidExternalSurfaceScope
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
@@ -12,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
@@ -131,20 +126,6 @@ fun VideoScreenContent(
 }
 
 @Composable
-fun PlayerSurface(player: Player, modifier: Modifier = Modifier) {
-    val onSurfaceCreated: (Surface) -> Unit = { surface -> player.setVideoSurface(surface) }
-    val onSurfaceDestroyed: () -> Unit = { player.setVideoSurface(null) }
-    val onSurfaceInitialized: AndroidExternalSurfaceScope.() -> Unit = {
-        onSurface { surface, _, _ ->
-            onSurfaceCreated(surface)
-            surface.onDestroyed { onSurfaceDestroyed() }
-        }
-    }
-
-    AndroidEmbeddedExternalSurface(modifier = modifier, onInit = onSurfaceInitialized)
-}
-
-@Composable
 fun Player(
     modifier: Modifier = Modifier,
     player: Player,
@@ -173,7 +154,6 @@ fun Player(
             }
         },
         modifier = modifier
-            .padding(horizontal = 48.dp)
             .aspectRatio(video.width.toFloat() / video.height)
     )
 }

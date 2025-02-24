@@ -1,8 +1,10 @@
 package ru.kpfu.itis.paramonov.videos.presentation.ui
 
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,10 +19,16 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -65,20 +73,50 @@ fun VideosScreen(
         }
     }
 
-    VideosScreenContent(
-        videos = state.value.videos,
-        isRefreshing = state.value.isRefreshing,
-        onRefresh = { viewModel.onIntent(VideosScreenIntent.GetMostPopularVideos(
-            limit = VIDEO_LIMIT,
-            after = getAfterDate()
-        )) },
-        onVideoClick = { video -> goToVideoScreen(video) }
-    )
+    val configuration = LocalConfiguration.current
+    var orientation by remember { mutableStateOf(configuration.orientation) }
+
+    LaunchedEffect(configuration) {
+        snapshotFlow { configuration.orientation }
+            .collect { newOrientation ->
+                orientation = newOrientation
+            }
+    }
+
+    if (orientation == ORIENTATION_PORTRAIT) {
+        VideosScreenPortraitContent(
+            videos = state.value.videos,
+            isRefreshing = state.value.isRefreshing,
+            onRefresh = {
+                viewModel.onIntent(
+                    VideosScreenIntent.GetMostPopularVideos(
+                        limit = VIDEO_LIMIT,
+                        after = getAfterDate()
+                    )
+                )
+            },
+            onVideoClick = { video -> goToVideoScreen(video) }
+        )
+    } else {
+        VideosScreenLandscapeContent(
+            videos = state.value.videos,
+            isRefreshing = state.value.isRefreshing,
+            onRefresh = {
+                viewModel.onIntent(
+                    VideosScreenIntent.GetMostPopularVideos(
+                        limit = VIDEO_LIMIT,
+                        after = getAfterDate()
+                    )
+                )
+            },
+            onVideoClick = { video -> goToVideoScreen(video) }
+        )
+    }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun VideosScreenContent(
+fun VideosScreenPortraitContent(
     modifier: Modifier = Modifier,
     videos: List<VideoUiModel>,
     isRefreshing: Boolean,
@@ -94,7 +132,8 @@ fun VideosScreenContent(
             modifier = Modifier.padding(16.dp).fillMaxSize()
         ) {
             items(videos) {
-                VideoItem(
+                VideoPortraitItem(
+                    modifier = Modifier.padding(vertical = 4.dp),
                     video = it,
                     onClick = onVideoClick
                 )
@@ -105,7 +144,56 @@ fun VideosScreenContent(
 }
 
 @Composable
-fun VideoItem(
+@OptIn(ExperimentalMaterial3Api::class)
+fun VideosScreenLandscapeContent(
+    modifier: Modifier = Modifier,
+    videos: List<VideoUiModel>,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    onVideoClick: (Long) -> Unit
+) {
+    PullToRefreshBox(
+        modifier = modifier.padding(top = 32.dp),
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+    ) {
+        LazyColumn(
+            modifier = Modifier.padding(16.dp).fillMaxSize()
+        ) {
+            items(videos) {
+                VideoLandscapeItem(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    video = it,
+                    onClick = onVideoClick
+                )
+                HorizontalDivider()
+            }
+        }
+    }
+}
+
+@Composable
+fun VideoPortraitItem(
+    modifier: Modifier = Modifier,
+    video: VideoUiModel,
+    onClick: (Long) -> Unit,
+) {
+    val ratio by remember(video) { mutableFloatStateOf(video.height.toFloat() / video.width) }
+    Column(
+        modifier = modifier.clickable {
+            onClick(video.id)
+        }.wrapContentHeight()
+            .fillMaxWidth()
+    ) {
+        VideoItemContent(
+            displayAsColumn = ratio < 1f,
+            video = video,
+        )
+    }
+}
+
+@Composable
+fun VideoLandscapeItem(
     modifier: Modifier = Modifier,
     video: VideoUiModel,
     onClick: (Long) -> Unit,
@@ -116,12 +204,58 @@ fun VideoItem(
         }.wrapContentHeight()
             .fillMaxWidth()
     ) {
-        Image(
-            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),
-            painter = rememberAsyncImagePainter(video.thumbnailUrl),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth
+        VideoItemContent(
+            displayAsColumn = false,
+            video = video,
         )
+    }
+}
+
+@Composable
+fun VideoItemContent(
+    modifier: Modifier = Modifier,
+    displayAsColumn: Boolean,
+    video: VideoUiModel,
+) {
+    if (displayAsColumn) {
+        Column(
+            modifier = modifier
+        ) {
+            Image(
+                modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),
+                painter = rememberAsyncImagePainter(video.thumbnailUrl),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth
+            )
+            TitleWithTime(
+                modifier = Modifier.fillMaxWidth(),
+                video = video
+            )
+        }
+    } else {
+        Row(
+            modifier = modifier
+        ) {
+            Image(
+                modifier = Modifier.fillMaxWidth(0.6f),
+                painter = rememberAsyncImagePainter(video.thumbnailUrl),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth
+            )
+            TitleWithTime(
+                modifier = Modifier.fillMaxWidth(),
+                video = video
+            )
+        }
+    }
+}
+
+@Composable
+fun TitleWithTime(
+    modifier: Modifier = Modifier,
+    video: VideoUiModel
+) {
+    Column(modifier = modifier) {
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = video.title,
